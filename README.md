@@ -6,7 +6,8 @@ A Python script for randomly generating new chess variants. Just run the script 
 * The generated layout is checked to ensure that every pawn is protected at the start of the game.
 
 # Example Output
-```Rudade Chess:
+```
+Rudade Chess:
 
   abcdefghi
 9 oliukuilo
@@ -29,4 +30,5 @@ F: Ferz (F)
 T: Tower (FR)
 E: Rudade (RDD)
 X: Archbishop (WB)
-W: Wazir (W)```
+W: Wazir (W)
+```
