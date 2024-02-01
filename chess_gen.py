@@ -1,5 +1,7 @@
 # This program randomly generates chess variants.
-# It randomly selects the board size and then generates an assortment of pieces to fill it, taking the board size into account when choosing how many pieces to create.
+# It randomly selects the board size and then generates an assortment of pieces to fill it.
+# It considers the board size when creating pieces to create.
+# It runs a check to make sure all pawns are protected in the opening layout, starting over if it isn't.
 # It then displays the new variant in an easily readable format.
 from random import randint
 from math import ceil
