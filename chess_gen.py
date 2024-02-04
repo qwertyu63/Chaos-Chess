@@ -19,6 +19,8 @@ atom_bind = [0, 1, 2, 3, 0, 0, 1, 1, 0, 0, 0, 1, 2]
 atom_sight = [0, 1, "", "", 2, 0, 1, 3, "", "", 2, "", ""]
 extra_sight = ["", "", 0, 2, 1, "", "", "", 3, 0, 1, 0, 0]
 
+halves = [["fb","s"], ["f","b"], ["fb","s"], ["f","b"], ["f","b"], ["fb","s"], ["f","b"]]
+
 long_convert = {"M": "NN", "G": "DD", "S": "AA"}
 
 # This is a list of default piece names.
@@ -65,16 +67,35 @@ prebuild = {
     "CZ": "Ram", 
     "WFN": "Centaur", 
     "DAN": "Squirrel", 
+    "WDA": "Champion", 
     "NCZ": "Dragon", 
     "NN": "Nightrider", 
-    "BNN": "Unicorn", 
-    "RNN": "Pegasus", 
     "DD": "Warmachine", 
-    "AA": "Elephant Rider"
+    "AA": "Elephant Rider", 
+    "BNN": "Unicorn", 
+    "RNN": "Pegasus",
+    "tFR": "Gryphon", 
+    "tWB": "Anaca", 
 }
+
+# Chaos determines the odds of any specific piece being a Chaos piece, with strange movements.
+chaos = 3
+
+def gen_piece(parts):
+    code = []
+    value = 0
+    bind = 9
+    while parts:
+        roll = randint(0, len(atoms)-1)
+        if clearcheck(atoms[roll], code):
+            code.append(atoms[roll])
+        parts -= 1
+    return compile_piece(code)
 
 def clearcheck(new, list):
     '''Given a new move and a list of existing moves, this fuctions determines if that move is redundant. It also rejects 50% of long leapers, to make those moves rarer.'''
+    if len(list) == 0:
+        return True
     if new in list:
         return False
     locks = {
@@ -87,7 +108,7 @@ def clearcheck(new, list):
     if new in locks.keys():
         if locks[new] in list:
             return False
-    if len(list) > 0 and new in long_atoms:
+    if new in long_atoms:
         return bool(randint(0, 1))
     return True
 
@@ -120,10 +141,117 @@ def compile_piece(code):
         name = make_name(label)
     return (label, value, name, sight)
 
+def chaos_piece():
+    "This function chooses what kind of chaos piece to use."
+    form = randint(1,3)
+    if form == 1:
+        roll = [[1,1], [1,1], [2,1], [1,2]][randint(0,3)]
+        partA = roll[0]
+        partB = roll[1]
+        if partB <= 0: partB = 1
+        return fusion_piece(gen_piece(partA), gen_piece(partB))
+    elif form == 2:
+        rand = randint(1,2)
+        return half_piece(gen_piece(rand), gen_piece(1))
+    elif form == 3:
+        return bent_rider()
+
+def long_swap(move, dire = True):
+    hold = move
+    if dire:
+        if "NN" in move:
+            hold = hold.replace("NN", "M")
+        if "DD" in move:
+            hold = hold.replace("DD", "S")
+        if "AA" in move:
+            hold = hold.replace("AA", "S")
+        return hold
+    else:
+        if "M" in move:
+            hold = hold.replace("M", "NN")
+        if "G" in move:
+            hold = hold.replace("G", "DD")
+        if "S" in move:
+            hold = hold.replace("S", "AA")
+        return hold
+
+def fusion_piece(pieceA, pieceB):
+    '''This function combines two pieces to form a Fusion piece that movess like pieceA and attacks like pieceB.'''
+    label = ""
+    moveA, moveB = long_swap(pieceA[0]), long_swap(pieceB[0])
+    for i in moveA:
+        if i in moveB:
+            label+=i
+            moveA = moveA.replace(i, "")
+            moveB = moveB.replace(i, "")
+    if len(moveA)!=0:
+        for i in moveA[0]:
+            label += (i + "m")
+    if len(moveB)!=0:
+        for i in moveB[0]:
+            label += (i + "c")
+    value = ceil(pieceA[1]/2) + (pieceB[1] // 2)
+    name = chop_name(pieceA[2], pieceB[2])
+    sight = pieceB[3]
+    return (long_swap(label, False), value, name, sight)
+
+def half_piece(pieceA, pieceB):
+    '''This function combines two pieces to form a Fusion piece that is pieceA, but can also move OR attack (not both) like pieceB.'''
+    split = ["c", "m"][randint(0,1)]
+    label = pieceA[0]
+    if pieceB[0] == "":
+        # This bit of code routes around an unsolved bug where pieceB fails to create.
+        return pieceA
+    if pieceB[0] in pieceA[0] or (pieceB[0] == "W" and "R" in pieceA[0]) or (pieceB[0] == "F" and "B" in pieceA[0]):
+        # This aborts the piece if pieceB is redundant.
+        return pieceA
+    tag = pieceB[0] + split
+    label += tag
+    value = pieceA[1] + (pieceB[1] // 2)
+    if tag[0] != "A":
+        tag = tag[0] + (["A", "E", "I", "O", "U"][randint(0, 4)]) + tag[1]
+    name = pieceA[2] + tag.lower()
+    sight = pieceA[3]
+    if split == "c":
+        sight += pieceB[3]
+    return (long_swap(label, False), value, name, sight)
+
+def bent_rider():
+    # This code generates a bent rider piece.
+    rollA = randint(0,4)
+    partA = ["W", "F", "D", "A", "N"][rollA]
+    partB = ["R", "B", "M", "G", "S"][randint(0,4)]
+    label = "t["+partA+partB+"]"
+    name = "t"+partA+partB
+    if name in ["tWR", "tFB", "tNM", "tDG", "tAS"]:
+        name = name[2]
+        label = label[3]
+    label = long_swap(label, False)
+    sight = [[],[]]
+
+    if atom_sight[rollA] != "":
+        sight[0].append(atom_sight[rollA])
+    if extra_sight[rollA] != "":
+        sight[1].append(extra_sight[rollA])
+
+    if name in prebuild.keys():
+        name = prebuild[name]
+    else:
+        name = make_name(name)
+
+    return (label, 9, name, sight)
+
+def chop_name(nameA, nameB):
+    name = nameA[0:ceil(len(nameA)/2)]
+    name += nameB[(len(nameB)//2):len(nameB)]
+    return name
+
 def make_name(word):
-    '''This function generates a name for a piece, using the letters from its name.'''
+    '''This function generates a name for a piece, using the letters from its movement code.'''
     name = ""
-    for i in word:
+    spaces = len(word)
+    if spaces > 3: spaces = 3
+    for i in word[0:spaces]:
         name += i
         if i not in ["A", "E", "I", "O", "U"]:
             name += ["A", "E", "I", "O", "U"][randint(0, 4)]
@@ -182,7 +310,7 @@ while True:
     backup_name = ""
     backup_value = 0
 
-    default = ["X", "Z", "J", "V", "Y"]
+    default = ["X", "J", "V", "Y"]
 
     # Setting the size and arrangement of the board.
     files = randint(6, 13)
@@ -203,7 +331,7 @@ while True:
             atoms += long_atoms
 
     # Create a list of pieces.
-    pieces = ["K"]
+    pieces = {"King": "K"}
     piece_desc = ["K: King (WF)"]
     piece_label = ["K"]
     piece_sight = {"K": [[0, 1], []]}
@@ -219,22 +347,20 @@ while True:
     die = [1, 1, 2, 2, 3]
     while piece_count:
         parts = die[randint(0, len(die)-1)]
-        code = []
-        value = 0
-        bind = 9
-        while parts:
-            roll = randint(0, len(atoms)-1)
-            if clearcheck(atoms[roll], code):
-                code.append(atoms[roll])
-            parts -= 1
-        new_piece = compile_piece(code)
-        if new_piece[1] > 0 and new_piece[1] < 11 and new_piece not in pieces:
-            pieces.append(new_piece[0])
-            label = getalpha(new_piece[2], new_piece[0])
-            desc = label + ": "+new_piece[2]+ " (" + new_piece[0] + ")"
-            piece_desc.append(desc)
-            piece_label.append(label)
-            piece_sight[label] = new_piece[3]
+        if randint(1,20) <= chaos:
+            new_piece = chaos_piece()
+        else:
+            new_piece = gen_piece(parts)
+        if new_piece[1] > 0 and new_piece[1] < 11:
+            if new_piece[0] not in pieces.keys():
+                label = getalpha(new_piece[2], new_piece[0])
+                pieces[new_piece[0]] = label
+                desc = label + ": "+new_piece[2]+ " (" + new_piece[0] + ")"
+                piece_desc.append(desc)
+                piece_sight[label] = new_piece[3]     
+            else:
+                label = pieces[new_piece[0]]
+            piece_label += label
             game_name_check(new_piece[2], new_piece[1], new_piece[0])
             piece_count-=1
 
