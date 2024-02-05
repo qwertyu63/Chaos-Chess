@@ -7,28 +7,28 @@ A Python script for randomly generating new chess variants. Just run the script 
 
 # Example Output
 ```
-Rudade Chess:
+Wafinuna Chess:
 
   abcdefghi
-9 oliukuilo
-8 ftexwxetf
-7 ppppppppp
+9 hmwxkcuid
+8 ppppppppp
+7 ---------
 6 ---------
 5 ---------
 4 ---------
-3 PPPPPPPPP
-2 FTEXWXETF
-1 OLIUKUILO
+3 ---------
+2 PPPPPPPPP
+1 HMWXKCUID
 
 Piece List:
 K: King (WF)
-O: Rohu (RH)
-L: Paladin (DB)
-I: Soldier (AR)
-U: Buhu (BH)
-F: Ferz (F)
-T: Tower (FR)
-E: Rudade (RDD)
-X: Archbishop (WB)
+H: Fiha (FH)
+M: Man (WF)
 W: Wazir (W)
+X: Faaa (FAA)
+C: Witch (BZ)
+U: Nudidu (NDD)
+I: Wafinuna (WFNN)
+D: Dabbaba (D)
+
 ```
