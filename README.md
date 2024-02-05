@@ -3,6 +3,7 @@ A Python script for randomly generating new chess variants. Just run the script 
 
 # Features
 * The script generates names and labels for every piece. Pieces common to variant chess keep their normal names, while more novel pieces have randomly generated names.
+* Randomly generated pieces can have restrictions or bent movements.
 * The generated layout is checked to ensure that every pawn is protected at the start of the game.
 
 # Example Output
