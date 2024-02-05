@@ -7,28 +7,23 @@ A Python script for randomly generating new chess variants. Just run the script 
 
 # Example Output
 ```
-Wafinuna Chess:
+Dunabi Chess:
 
-  abcdefghi
-9 hmwxkcuid
-8 ppppppppp
-7 ---------
-6 ---------
-5 ---------
-4 ---------
-3 ---------
-2 PPPPPPPPP
-1 HMWXKCUID
+  abcdefgh
+8 uixtkxiu
+7 pppppppp
+6 --------
+5 --------
+4 --------
+3 --------
+2 PPPPPPPP
+1 UIXTKXIU
 
 Piece List:
 K: King (WF)
-H: Fiha (FH)
-M: Man (WF)
-W: Wazir (W)
-X: Faaa (FAA)
-C: Witch (BZ)
-U: Nudidu (NDD)
-I: Wafinuna (WFNN)
-D: Dabbaba (D)
+U: Boramu (BRm)
+I: Paladin (DB)
+X: Dunabi (DNB)
+T: Tiwua (t[WA])
 
 ```
