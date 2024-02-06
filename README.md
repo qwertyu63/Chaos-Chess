@@ -1,5 +1,5 @@
 # Chaos-Chess
-A Python script for randomly generating new chess variants. Just run the script and it generates a brand-new version of chess, with randomly generated pieces in a never-before-seen arrangement. The moves of each piece are recorded in Betza's funny notation <https://en.wikipedia.org/wiki/Betza%27s_funny_notation>.
+A Python script for randomly generating new chess variants. Just run the script and it generates a brand-new variant of chess, with randomly generated pieces in a never-before-seen arrangement. The moves of each piece are recorded in Betza's funny notation <https://en.wikipedia.org/wiki/Betza%27s_funny_notation>.
 
 # Features
 * The script generates names and labels for every piece. Pieces common to variant chess keep their normal names, while more novel pieces have randomly generated names.
@@ -12,29 +12,38 @@ A Python script for randomly generating new chess variants. Just run the script 
 
 # Example Output
 ```
-Berifa Chess:
+Wobeze Chess:
 
-  abcdefgh
-8 mietkbbs
-7 pppppppp
-6 --------
-5 --------
-4 --------
-3 --------
-2 PPPPPPPP
-1 MIETKBBS
+   abcdefghij
+11 iuheokxvzj
+10 pppppppppp
+ 9 ----------
+ 8 ----------
+ 7 ----------
+ 6 ----------
+ 5 ----------
+ 4 ----------
+ 3 ----------
+ 2 PPPPPPPPPP
+ 1 IUHEOKXVZJ
 
 Piece List:
 K: King (WF)
-M: Woodman (WD)
-I: Berifa (BRf)
-E: Daare (DAR)
-T: Detiwa (Dt[WF])
-B: Bishop (B)
-S: Priest (FN)
+I: Nicihi (NCH)
+U: Abucu (ABC)
+H: Witch (BZ)
+E: Wobeze (WBZ)
+O: Archbishop (WB)
+X: Nihaai (NHa)
+V: Nohafo (NHfb)
+Z: Buzuhu (BZH)
+J: Wedifi (WDfbZf)
 
 Rules:
 All normal chess rules apply, except as noted below.
-The King can castle with the pieces in the corners of its starting rank. All normal castling rules apply; the king moves two spaces towards the other piece.
+Pawns may move three spaces on their first move. En passant can occur on either skipped space.
+The King can castle with the pieces in the corners of its starting rank.
+All normal castling rules apply; the king moves three spaces towards the other piece.
+When promoting, Pawns may promote to any piece in this variant, except for the King.
 
 ```
