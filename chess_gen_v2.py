@@ -307,6 +307,9 @@ while True:
     ranks = randint(5,13)
     files = randint(5,13)
 
+    # This line defaults the board size to standard, for testing.
+    # ranks, files = 8, 8
+
     # If the board is wide enough, we will enable the use of long leapers and leaping riders.
     if ranks + files >= 18:
         big_board = True
@@ -534,7 +537,9 @@ if empty_ranks <= 3:
 castle = "two"
 if files >= 10: castle = "three"
 
-if files >= randint(7, 9):
-    print("The King can castle with the pieces in the corners of its starting rank. All normal castling rules apply; the king moves "+castle+" spaces towards the piece.")
+if files >= 7:
+    print("The King can castle with the pieces in the corners of its starting rank.\nAll normal castling rules apply; the king moves "+castle+" spaces towards the other piece.")
 else:
     print("There is no castling.")
+
+print("When promoting, Pawns may promote to any piece in this variant, except for the King.")
