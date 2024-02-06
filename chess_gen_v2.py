@@ -109,8 +109,6 @@ class move(object):
             self.bind = 9
             self.value *= 0.4
             self.code += "a"
-        if self.code[0] != self.lock:
-            self.lock = "X"
 
     def bent_ride(self):
         step_roll = randint(0,6)
@@ -123,6 +121,8 @@ class move(object):
             self.sight = first_step.sight
             self.code = new_code
             self.lock = first_step.lock
+        if first_step.bind < self.bind:
+            self.bind = first_step.bind
 
     def __str__(self):
         return self.code
@@ -141,21 +141,27 @@ long_atoms = [
     move(7, "C", 3, 1, [[3], []], 2, "C"),
     move(8, "Z", 2, 0, [[], [3]], 2, "Z"),
     move(9, "H", 1, 9, [[], []], 2, "H"),
+]
+
+rare_atoms = [
     move(10, "DD", 2, 2, [[], [0]], 2, "D"),
     move(11, "AA", 2, 3, [[], [2]], 2, "A"),
     move(12, "NN", 5, 0, [[2], [1]], 2, "N"),    
 ]
 
-def gen_piece(big = False):
+def gen_piece(big = False, even_strike = True):
     roll = [1, 2, 2, 2, 3, 3][randint(0, 5)]
     new_piece = piece()
     while roll >= 1:
         if big and randint(0,1):
-            side = long_atoms[randint(0,len(long_atoms)-1)]
+            if randint(0,3) == 0 and even_strike:
+                side = rare_atoms[randint(0, len(rare_atoms)-1)]
+            else:
+                side = long_atoms[randint(0, len(long_atoms)-1)]
         else:
-           side = nor_atoms[randint(0,len(nor_atoms)-1)]
+            side = nor_atoms[randint(0,len(nor_atoms)-1)]
         count = 1
-        if randint(1,20) >= 15:
+        if randint(1,3) == 1:
             first = not bool(len(new_piece.moves))
             side, count = gen_chaos(side, first)
         new_piece.add_move(side)
@@ -250,10 +256,11 @@ prebuild = {
     "AA": "Elephant Rider", 
     "BNN": "Unicorn", 
     "RNN": "Pegasus",
-    "tFR": "Gryphon", 
-    "tWB": "Anaca", 
-    "tDR": "Lancer", 
-    "tAB": "Monk", 
+    "t[FR]": "Gryphon", 
+    "t[WB]": "Anaca", 
+    "t[DR]": "Lancer", 
+    "t[AB]": "Monk", 
+    "t[WF]": "Mule", 
 }
 
 # This is the start of the board generation.
@@ -262,6 +269,8 @@ while True:
 
     ranks = randint(6,13)
     files = randint(6,13)
+
+    # ranks, files = 8,8
 
     if ranks + files >= 18:
         big_board = True
@@ -276,6 +285,9 @@ while True:
     piece_count = files
     if large_camp:
         piece_count += files
+
+    # If a leaping rider could attack the opposing back rank, we need to not use them.
+    even_strike = not (ranks % 2 == 1 or large_camp)
 
     # If there are too many pieces, we half the piece count by making the board symmetrical.
     sym = piece_count >= randint(7,12)
@@ -301,8 +313,8 @@ while True:
 
     # This section generates all of the pieces.
     while len(slots) != piece_count:
-        new_piece = gen_piece(big_board)
-        if new_piece.value <= 9 and new_piece.code != "H":
+        new_piece = gen_piece(big_board, even_strike)
+        if (new_piece.value <= 9 and new_piece.value >= 1) or new_piece.code in prebuild.keys():
             if new_piece.code not in pieces.keys():
                 pieces[new_piece.code] = new_piece
             slots.append(new_piece.code)
