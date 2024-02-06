@@ -3,28 +3,38 @@ A Python script for randomly generating new chess variants. Just run the script 
 
 # Features
 * The script generates names and labels for every piece. Pieces common to variant chess keep their normal names, while more novel pieces have randomly generated names.
-* Randomly generated pieces can have restrictions or bent movements.
 * The generated layout is checked to ensure that every pawn is protected at the start of the game.
+* Randomly generated pieces are usually simple, but sometimes include "chaos" aspects, such as:
+  * Movement restrictions: movements that can only be used peacefully or when capturing.
+  * Direction restictions: movements that only work in specific directions.
+  * Bent moves: movements that are a sequence of other moves, such as "make a Wazir move, then a Bishop move".
+* A summary of rule tweaks are included, adjusting the pawns and castling to account for the board size.
 
 # Example Output
 ```
-Dunabi Chess:
+Berifa Chess:
 
   abcdefgh
-8 uixtkxiu
+8 mietkbbs
 7 pppppppp
 6 --------
 5 --------
 4 --------
 3 --------
 2 PPPPPPPP
-1 UIXTKXIU
+1 MIETKBBS
 
 Piece List:
 K: King (WF)
-U: Boramu (BRm)
-I: Paladin (DB)
-X: Dunabi (DNB)
-T: Tiwua (t[WA])
+M: Woodman (WD)
+I: Berifa (BRf)
+E: Daare (DAR)
+T: Detiwa (Dt[WF])
+B: Bishop (B)
+S: Priest (FN)
+
+Rules:
+All normal chess rules apply, except as noted below.
+The King can castle with the pieces in the corners of its starting rank. All normal castling rules apply; the king moves two spaces towards the other piece.
 
 ```
