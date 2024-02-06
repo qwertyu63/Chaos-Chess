@@ -1,3 +1,9 @@
+# This program randomly generates chess variants.
+# It randomly selects the board size and then generates an assortment of pieces to fill it.
+# It considers the board size when creating pieces to create.
+# It runs a check to make sure all pawns are protected in the opening layout, starting over if it isn't.
+# It then displays the new variant in an easily readable format.
+
 from random import randint
 from math import ceil
 
@@ -13,17 +19,20 @@ class piece(object):
         self.lock = []
 
     def royal_blood(self):
+        '''This method turns this piece into a King.'''
         self.moves = [nor_atoms[0], nor_atoms[1]]
         self.compile()
         self.name = "King"
 
     def add_move(self, move):
+        '''This method adds the provided move to this piece, provided it isn't redundant.'''
         accept = True
         if move.lock not in self.lock:
             self.moves.append(move)
             self.lock.append(move.lock)
 
     def compile(self):
+        '''This method runs through the piece's moves, recording each to create the pieces code and name.'''
         new_code = ""
         parts = []
         self.value = 0
@@ -48,6 +57,7 @@ class piece(object):
         self.name_gen()
 
     def name_gen(self):
+        '''This method determines the name of the piece.'''
         if self.code in prebuild.keys():
             self.name = prebuild[self.code]
         else:
@@ -69,6 +79,7 @@ class piece(object):
         return line
 
     def set_letter(self, default, list):
+        '''This method sets and stores the letter for this piece.'''
         self.letter = ""
         if len(self.code) == 1:
             self.letter = self.code
@@ -86,7 +97,7 @@ class piece(object):
         return self.letter
 
 class move(object):
-    def __init__(self, id, code, value, bind, sight, reach, lock, dir = ["f", "b", "s"]):
+    def __init__(self, id, code, value, bind, sight, reach, lock, dir):
         self.id = id
         self.code = code
         self.value = value
@@ -98,7 +109,7 @@ class move(object):
 
     def clone(self, offset):
         new_id = self.id + offset
-        return move(new_id, self.code, self.value, self.bind, self.sight, self.reach, self.lock)
+        return move(new_id, self.code, self.value, self.bind, self.sight, self.reach, self.lock, self.dir)
 
     def peace_war(self, peace="True"):
         if peace:
@@ -124,32 +135,51 @@ class move(object):
         if first_step.bind < self.bind:
             self.bind = first_step.bind
 
+    def breaker(self, hard_lock = ""):
+        if hard_lock:
+            dir_lock = hard_lock
+        else:
+            dir_lock = self.dir[randint(0,len(self.dir)-1)]
+        self.value /= 2
+        if ("s" in self.dir) and (dir_lock != "s"):
+            if randint(0, 1):
+                self.value /= 2
+            else:
+                dir_lock = "fb"
+        if dir_lock not in ["f", "fb"]:
+            self.sight = [[], []]
+        self.code += dir_lock
+        return dir_lock
+
     def __str__(self):
         return self.code
 
+# (id, code, value, bind, sight, reach, lock, dir)
+# This section lists the basic move atoms.
 nor_atoms = [
-    move(0, "W", 2, 0, [[0], []], 1, "W"),
-    move(1, "F", 2, 1, [[1], []], 1, "F"),
-    move(2, "D", 1, 2, [[], [0]], 1, "D"),
-    move(3, "A", 1, 3, [[], [2]], 1, "A"),
-    move(4, "N", 3, 0, [[2], [1]], 1, "N"),
-    move(5, "R", 4, 0, [[0], []], 1, "W"),
-    move(6, "B", 5, 1, [[1], []], 1, "F"),
+    move(0, "W", 2, 0, [[0], []], 1, "W", ["f", "b", "s"]),
+    move(1, "F", 2, 1, [[1], []], 1, "F", ["f", "b"]),
+    move(2, "D", 1, 2, [[], [0]], 1, "D", ["f", "b", "s"]),
+    move(3, "A", 1, 3, [[], [2]], 1, "A", ["f", "b"]),
+    move(4, "N", 3, 0, [[2], [1]], 1, "N", ["f", "b"]),
+    move(5, "R", 4, 0, [[0], []], 1, "W", ["f", "b", "s"]),
+    move(6, "B", 5, 1, [[1], []], 1, "F", ["f", "b"]),
 ]
 
 long_atoms = [
-    move(7, "C", 3, 1, [[3], []], 2, "C"),
-    move(8, "Z", 2, 0, [[], [3]], 2, "Z"),
-    move(9, "H", 1, 9, [[], []], 2, "H"),
+    move(7, "C", 3, 1, [[3], []], 2, "C", ["f", "b"]),
+    move(8, "Z", 2, 0, [[], [3]], 2, "Z", ["f", "b"]),
+    move(9, "H", 1, 9, [[], []], 2, "H", ["f", "b", "s"]),
 ]
 
 rare_atoms = [
-    move(10, "DD", 2, 2, [[], [0]], 2, "D"),
-    move(11, "AA", 2, 3, [[], [2]], 2, "A"),
-    move(12, "NN", 5, 0, [[2], [1]], 2, "N"),    
+    move(10, "DD", 2, 2, [[], [0]], 2, "D", ["f", "b", "s"]),
+    move(11, "AA", 2, 3, [[], [2]], 2, "A", ["f", "b"]),
+    move(12, "NN", 5, 0, [[2], [1]], 2, "N", ["f", "b"]),    
 ]
 
 def gen_piece(big = False, even_strike = True):
+    '''This function generates a new piece.'''
     roll = [1, 2, 2, 2, 3, 3][randint(0, 5)]
     new_piece = piece()
     while roll >= 1:
@@ -170,7 +200,8 @@ def gen_piece(big = False, even_strike = True):
     return new_piece
 
 def gen_chaos(side, first = False):
-    chaosroll = randint(1,3)
+    '''This function takes a normal move and makes it chaotic in some fashion.'''
+    chaosroll = randint(1,4)
     new_side = side.clone(100*chaosroll)
     restrict = False
     count = 1
@@ -183,12 +214,17 @@ def gen_chaos(side, first = False):
     elif chaosroll == 3:
         new_side.bent_ride()
         count = 2
+    elif chaosroll == 4:
+        dir_lock = new_side.breaker()
+        if dir_lock in ["f", "b"] and first:
+            count = 0
     if restrict and first:
         return side, count
     else:
         return new_side, count
 
 def pawn_check(pieces, slots, row, reach = 0):
+    '''This function takes a row of pieces and calculates which pawns it protects.'''
     for i, j in enumerate(slots):
         if j:
             sight = pieces[j].sight[reach]
@@ -198,6 +234,7 @@ def pawn_check(pieces, slots, row, reach = 0):
     return row
 
 def push_name(piece, box):
+    '''This function updates the tracking of piece names and power used to determine the piece that names the game.'''
     if piece.code in prebuild.keys():
         if piece.value > box[1][1]:
             box[1] = [piece.name, piece.value]
@@ -267,31 +304,32 @@ prebuild = {
 while True:
     name_box = [["", -9], ["King", 0]]
 
-    ranks = randint(6,13)
-    files = randint(6,13)
+    ranks = randint(5,13)
+    files = randint(5,13)
 
-    # ranks, files = 8,8
-
+    # If the board is wide enough, we will enable the use of long leapers and leaping riders.
     if ranks + files >= 18:
         big_board = True
     else:
         big_board = False
 
-    if ranks > randint(9,12):
+    # If the board is long enough, we might add a second row of pieces.
+    if ranks > randint(9,14):
         large_camp = True
     else:
         large_camp = False
 
+
+    # If a leaping rider could attack the opposing back rank, we need to not use them.
+    even_strike = not ranks % 2 == 1
+
+    # This calulates how many pieces will be needed.
     piece_count = files
     if large_camp:
         piece_count += files
 
-    # If a leaping rider could attack the opposing back rank, we need to not use them.
-    even_strike = not (ranks % 2 == 1 or large_camp)
-
     # If there are too many pieces, we half the piece count by making the board symmetrical.
     sym = piece_count >= randint(7,12)
-
     if sym:
         piece_count -= files//2
         if large_camp:
@@ -301,9 +339,7 @@ while True:
         if files % 2 == 0:
             piece_count += 1
 
-    # This is a debug print.
-    # print(str(files)+" files, "+str(piece_count)+" pieces, sym " + str(sym))
-
+    # This creates the starting piece list, adding the all-important King to the set.
     king = piece()
     king.royal_blood()
 
@@ -397,6 +433,7 @@ default_list = ["X", "V", "H", "J", "Y"]
 default = default_list.pop(0)
 letters_used = []
 
+# This assigns a letter to each piece, used to indicate it on the board.
 for i in pieces.keys():
     new = pieces[i].set_letter(default, letters_used)
     letters_used.append(new)
@@ -408,7 +445,6 @@ for i in pieces.keys():
     if new in default_list: default_list.remove(new)
 
 # This section prints the starting board state, with grid coordinates.
-
 letters = "abcdefghijklmnopqrstuvwxyz"
 if ranks >= 10:
     print("   ", end="")
@@ -451,6 +487,9 @@ rank_count = label_rank(rank_count)
 print("p" * files)
 ranks_left -= 2
 
+# This stores the number of empty ranks, for use later.
+empty_ranks = ranks_left
+
 while ranks_left:
     rank_count = label_rank(rank_count)
     print("-" * files)
@@ -478,7 +517,24 @@ for i in home_row:
 print()
 print()
 
+# This section generates the list of moves.
 print("Piece List:")
 for i in true_pieces:
     print(pieces[i].describe())
+print()
 
+print("""Rules:
+All normal chess rules apply, except as noted below.""")
+
+if empty_ranks >= 6:
+    print("Pawns may move three spaces on their first move. En passant can occur on either skipped space.")
+if empty_ranks <= 3:
+    print("Pawns do not have their double step move option.")
+
+castle = "two"
+if files >= 10: castle = "three"
+
+if files >= randint(7, 9):
+    print("The King can castle with the pieces in the corners of its starting rank. All normal castling rules apply; the king moves "+castle+" spaces towards the piece.")
+else:
+    print("There is no castling.")
