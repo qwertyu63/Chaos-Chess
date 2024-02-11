@@ -223,6 +223,10 @@ def gen_chaos(side, first = False):
     else:
         return new_side, count
 
+def gen_pawn():
+    '''This function will generate custom pawn movement.'''
+    pass
+
 def pawn_check(pieces, slots, row, reach = 0):
     '''This function takes a row of pieces and calculates which pawns it protects.'''
     for i, j in enumerate(slots):
@@ -322,7 +326,6 @@ while True:
     else:
         large_camp = False
 
-
     # If a leaping rider could attack the opposing back rank, we need to not use them.
     even_strike = not ranks % 2 == 1
 
@@ -347,7 +350,7 @@ while True:
     king.royal_blood()
 
     pieces = {"K": king}
-    slots = ["K"]
+    slots = []
     royal_home = files // 2
 
     # This section generates all of the pieces.
@@ -361,6 +364,8 @@ while True:
 
     # This section builds the starting board setup.
     true_pieces = ["K"]
+    slots.sort(key=lambda x: pieces[x].value, reverse=True)
+    slots.insert(0, "K")
 
     home_row = [""] * files
     counter = 1
@@ -375,15 +380,19 @@ while True:
             counter+=1
         home_row[royal_home] = "K"
     else:
-        for i in range(0, files):
-            if i == royal_home:
-                home_row[i] = "K"
-            else: 
-                home_row[i] = slots[counter]
-                if slots[counter] not in true_pieces:
-                    true_pieces.append(slots[counter])
-                counter+=1
-
+        i = 0
+        while i != royal_home:
+            home_row[i] = slots[counter]
+            if slots[counter] not in true_pieces:
+                true_pieces.append(slots[counter])
+            counter+=1
+            home_row[-(i+1)] = slots[counter]
+            if slots[counter] not in true_pieces:
+                true_pieces.append(slots[counter])
+            i+=1
+            counter+=1
+    home_row[royal_home] = "K"
+    
     if large_camp:
         extra_row = [""] * files
         if sym:
@@ -458,7 +467,7 @@ for i in range(0, files):
 print()
 
 ranks_left = ranks
-rank_count=ranks
+rank_count = ranks
 
 def label_rank(count):
     if ranks >= 10 and count < 10:
