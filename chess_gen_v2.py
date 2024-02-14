@@ -191,7 +191,8 @@ def gen_piece(big = False, even_strike = True):
         else:
             side = nor_atoms[randint(0,len(nor_atoms)-1)]
         count = 1
-        if randint(1,3) == 1:
+        if randint(1,4) == 1:
+            # This section results in a chance for any given move to be a Chaos Move.
             first = not bool(len(new_piece.moves))
             side, count = gen_chaos(side, first)
         new_piece.add_move(side)
@@ -374,8 +375,6 @@ while True:
         while i != royal_home:
             home_row[i] = slots[counter]
             home_row[-(i+1)] = slots[counter]
-            if slots[counter] not in true_pieces:
-                true_pieces.append(slots[counter])
             i+=1
             counter+=1
         home_row[royal_home] = "K"
@@ -383,15 +382,16 @@ while True:
         i = 0
         while i != royal_home:
             home_row[i] = slots[counter]
-            if slots[counter] not in true_pieces:
-                true_pieces.append(slots[counter])
             counter+=1
-            home_row[-(i+1)] = slots[counter]
-            if slots[counter] not in true_pieces:
-                true_pieces.append(slots[counter])
+            if len(home_row)-(i+1) != royal_home:
+                home_row[-(i+1)] = slots[counter]
+                counter+=1
             i+=1
-            counter+=1
     home_row[royal_home] = "K"
+
+    for i in home_row:
+        if i not in true_pieces:
+            true_pieces.append(i)
     
     if large_camp:
         extra_row = [""] * files
@@ -400,20 +400,18 @@ while True:
             while i != royal_home:
                 extra_row[i] = slots[counter]
                 extra_row[-(i+1)] = slots[counter]
-                if slots[counter] not in true_pieces:
-                    true_pieces.append(slots[counter])
                 counter+=1
                 i += 1
             if files % 2 == 1:
                 extra_row[royal_home] = slots[counter]
-                if slots[counter] not in true_pieces:
-                    true_pieces.append(slots[counter])
         else:
             for i in range(0, files):
                 extra_row[i] = slots[counter]
-                if slots[counter] not in true_pieces:
-                    true_pieces.append(slots[counter])
                 counter+=1
+                
+        for i in extra_row:
+            if i not in true_pieces:
+                true_pieces.append(i)
 
     # This section checks if every pawn is guarded.
     pawns_row = [False] * files
