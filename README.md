@@ -12,38 +12,33 @@ A Python script for randomly generating new chess variants. Just run the script 
 
 # Example Output
 ```
-Wobeze Chess:
+Dotowa Chess:
 
-   abcdefghij
-11 iuheokxvzj
-10 pppppppppp
- 9 ----------
- 8 ----------
- 7 ----------
- 6 ----------
- 5 ----------
- 4 ----------
- 3 ----------
- 2 PPPPPPPPPP
- 1 IUHEOKXVZJ
+  abcdefghi
+8 qosukxtml
+7 ppppppppp
+6 ---------
+5 ---------
+4 ---------
+3 ---------
+2 PPPPPPPPP
+1 QOSUKXTML
 
 Piece List:
 K: King (WF)
-I: Nicihi (NCH)
-U: Abucu (ABC)
-H: Witch (BZ)
-E: Wobeze (WBZ)
-O: Archbishop (WB)
-X: Nihaai (NHa)
-V: Nohafo (NHfb)
-Z: Buzuhu (BZH)
-J: Wedifi (WDfbZf)
+Q: Queen (RB)
+O: Dotowa (Dt[WN])
+S: Marquis (WN)
+U: Fewefu (FWfb)
+X: Woodman (WD)
+T: Acrobat (DR)
+M: Shaman (AB)
+L: Cardinal (NB)
 
 Rules:
 All normal chess rules apply, except as noted below.
-Pawns may move three spaces on their first move. En passant can occur on either skipped space.
 The King can castle with the pieces in the corners of its starting rank.
-All normal castling rules apply; the king moves three spaces towards the other piece.
+All normal castling rules apply; the king moves two spaces towards the other piece.
 When promoting, Pawns may promote to any piece in this variant, except for the King.
 
 ```
