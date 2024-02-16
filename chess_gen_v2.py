@@ -253,13 +253,14 @@ nor_atoms = [
 long_atoms = [
     move(7, "C", 3, 1, [[3], []], 2, "C", ["f", "b"]),
     move(8, "Z", 2, 0, [[], [3]], 2, "Z", ["f", "b"]),
-    move(9, "H", 1, 9, [[], []], 2, "H", ["f", "b", "s"]),
 ]
 
 rare_atoms = [
-    move(10, "DD", 2, 2, [[], [0]], 2, "D", ["f", "b", "s"], 0),
-    move(11, "AA", 2, 3, [[], [2]], 2, "A", ["f", "b"], 2),
-    move(12, "NN", 5, 0, [[2], [1]], 2, "N", ["f", "b"], 1),
+    move(9, "H", 1, 9, [[], []], 2, "H", ["f", "b", "s"]),
+    move(10, "G", 1, 9, [[], []], 1, "G", ["f", "b"]),
+    move(11, "DD", 2, 2, [[], [0]], 2, "D", ["f", "b", "s"], 0),
+    move(12, "AA", 2, 3, [[], [2]], 2, "A", ["f", "b"], 2),
+    move(13, "NN", 5, 0, [[2], [1]], 2, "N", ["f", "b"], 1),
 ]
 
 # This is a list of default piece names.
@@ -478,6 +479,9 @@ default_list = ["X", "V", "H", "J", "Y"]
 default = default_list.pop(0)
 letters_used = []
 
+# This chooses if the players should have mirrored starting positions or aligned starting positions (like normal chess).
+mirror = bool(randint(0, 1))
+
 # This assigns a letter to each piece, used to indicate it on the board.
 for i in pieces.keys():
     new = pieces[i].set_letter(default, letters_used)
@@ -546,12 +550,15 @@ if randint(0, files) >= 5 and randint(0, empty_ranks) >= 3:
     symbol = ["#", "*", "!"][randint(0,2)]
     pivot = empty_ranks//2
     odd_rank = (empty_ranks % 2 == 1)
-    litter = randint(files//4, files//3)
+    litter = randint(files//4+1, files//3+1)
     while litter != 0:
         x = randint(0, pivot)
         y = randint(0, files - 1)
         empty_zone[x][y] = symbol
-        empty_zone[-(x+1)][-(y+1)] = symbol
+        if mirror:
+            empty_zone[-(x+1)][-(y+1)] = symbol
+        else:
+            empty_zone[-(x+1)][y] = symbol
         litter -= 1
     for i, j in enumerate(empty_zone):
         empty_zone[i] = "".join(j)
@@ -563,6 +570,10 @@ for i in empty_zone:
 
 rank_count = label_rank(rank_count)
 print("P" * files)
+
+if mirror:
+    home_row.reverse()
+    if large_camp: extra_row.reverse()
 
 if large_camp:
     rank_count = label_rank(rank_count)
@@ -607,9 +618,9 @@ else:
 
 print("When promoting, Pawns may promote to any piece in this variant, except for the King.")
 
-tile_rules = ["can't be moved onto or through by any piece except for pawns.", 
-              "can't be moved through, but can be landed on.",
-              "grant pieces standing on them the right to move like a King."]
+tile_rules = ["are walls; they can't be moved onto or through by any piece, except for pawns.", 
+              "are rough terrain; they can't be moved through, but can be landed on.",
+              "are magic towers: pieces standing on them may move like a King."]
 if symbol:
-    print("Squares marked with "+symbol+" "+tile_rules[randint(0,2)])
+    print("Squares marked with " + symbol + " " + tile_rules[randint(0, len(tile_rules)-1)])
 
