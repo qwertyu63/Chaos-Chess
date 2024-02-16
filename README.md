@@ -8,6 +8,7 @@ A Python script for randomly generating new chess variants. Just run the script 
   * Movement restrictions: movements that can only be used peacefully or when capturing.
   * Direction restictions: movements that only work in specific directions.
   * Bent moves: movements that are a sequence of other moves, such as "make a Wazir move, then a Bishop move".
+* The script can sometimes add special spaces to the board with additional properties.
 * A summary of rule tweaks are included, adjusting the pawns and castling to account for the board size.
 
 # Example Output
