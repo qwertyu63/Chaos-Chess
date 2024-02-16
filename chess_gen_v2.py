@@ -17,6 +17,7 @@ class piece(object):
         self.code = ""
         self.letter = ""
         self.lock = []
+        self.drift = []
 
     def royal_blood(self):
         '''This method turns this piece into a King.'''
@@ -37,6 +38,7 @@ class piece(object):
         parts = []
         self.value = 0
         self.bind = 9
+        self.drift = []
         self.moves.sort(key=lambda x: x.id)
 
         for i in self.moves:
@@ -51,6 +53,8 @@ class piece(object):
             self.value += i.value
             if self.bind > i.bind:
                 self.bind = i.bind
+            if i.drift not in self.drift:
+                self.drift.append(i.drift)
         self.value -= self.bind
 
         self.code = new_code
@@ -97,7 +101,7 @@ class piece(object):
         return self.letter
 
 class move(object):
-    def __init__(self, id, code, value, bind, sight, reach, lock, dir):
+    def __init__(self, id, code, value, bind, sight, reach, lock, dir, drift = 99):
         self.id = id
         self.code = code
         self.value = value
@@ -106,6 +110,7 @@ class move(object):
         self.reach = reach
         self.lock = lock
         self.dir = dir
+        self.drift = drift
 
     def clone(self, offset):
         new_id = self.id + offset
@@ -136,6 +141,7 @@ class move(object):
             self.bind = first_step.bind
 
     def breaker(self, hard_lock = ""):
+        # This method locks down the directions of a move.
         if hard_lock:
             dir_lock = hard_lock
         else:
@@ -154,37 +160,13 @@ class move(object):
     def __str__(self):
         return self.code
 
-# (id, code, value, bind, sight, reach, lock, dir)
-# This section lists the basic move atoms.
-nor_atoms = [
-    move(0, "W", 2, 0, [[0], []], 1, "W", ["f", "b", "s"]),
-    move(1, "F", 2, 1, [[1], []], 1, "F", ["f", "b"]),
-    move(2, "D", 1, 2, [[], [0]], 1, "D", ["f", "b", "s"]),
-    move(3, "A", 1, 3, [[], [2]], 1, "A", ["f", "b"]),
-    move(4, "N", 3, 0, [[2], [1]], 1, "N", ["f", "b"]),
-    move(5, "R", 4, 0, [[0], []], 1, "W", ["f", "b", "s"]),
-    move(6, "B", 5, 1, [[1], []], 1, "F", ["f", "b"]),
-]
-
-long_atoms = [
-    move(7, "C", 3, 1, [[3], []], 2, "C", ["f", "b"]),
-    move(8, "Z", 2, 0, [[], [3]], 2, "Z", ["f", "b"]),
-    move(9, "H", 1, 9, [[], []], 2, "H", ["f", "b", "s"]),
-]
-
-rare_atoms = [
-    move(10, "DD", 2, 2, [[], [0]], 2, "D", ["f", "b", "s"]),
-    move(11, "AA", 2, 3, [[], [2]], 2, "A", ["f", "b"]),
-    move(12, "NN", 5, 0, [[2], [1]], 2, "N", ["f", "b"]),    
-]
-
-def gen_piece(big = False, even_strike = True):
+def gen_piece(big = False):
     '''This function generates a new piece.'''
     roll = [1, 2, 2, 2, 3, 3][randint(0, 5)]
     new_piece = piece()
     while roll >= 1:
         if big and randint(0,1):
-            if randint(0,3) == 0 and even_strike:
+            if randint(0,3) == 0:
                 side = rare_atoms[randint(0, len(rare_atoms)-1)]
             else:
                 side = long_atoms[randint(0, len(long_atoms)-1)]
@@ -238,6 +220,16 @@ def pawn_check(pieces, slots, row, reach = 0):
                 if i+x < len(row): row[i+x]=True
     return row
 
+def jump_over(distance, piece, row, ranks):
+    '''This function will check if a piece can directly attack opposing pieces over the starting pawns, returning False if they can.'''
+    test = True
+    drift = pieces[piece].drift
+    for i in drift:
+        target = i * distance
+        if row - target > 0 or row + target < row:
+            test = False
+    return test
+
 def push_name(piece, box):
     '''This function updates the tracking of piece names and power used to determine the piece that names the game.'''
     if piece.code in prebuild.keys():
@@ -246,6 +238,29 @@ def push_name(piece, box):
     else:
         if piece.value > box[0][1]:
             box[0] = [piece.name, piece.value]
+
+# This section lists the basic move atoms.
+nor_atoms = [
+    move(0, "W", 2, 0, [[0], []], 1, "W", ["f", "b", "s"]),
+    move(1, "F", 2, 1, [[1], []], 1, "F", ["f", "b"]),
+    move(2, "D", 1, 2, [[], [0]], 1, "D", ["f", "b", "s"]),
+    move(3, "A", 1, 3, [[], [2]], 1, "A", ["f", "b"]),
+    move(4, "N", 3, 0, [[2], [1]], 1, "N", ["f", "b"]),
+    move(5, "R", 4, 0, [[0], []], 1, "W", ["f", "b", "s"]),
+    move(6, "B", 5, 1, [[1], []], 1, "F", ["f", "b"]),
+]
+
+long_atoms = [
+    move(7, "C", 3, 1, [[3], []], 2, "C", ["f", "b"]),
+    move(8, "Z", 2, 0, [[], [3]], 2, "Z", ["f", "b"]),
+    move(9, "H", 1, 9, [[], []], 2, "H", ["f", "b", "s"]),
+]
+
+rare_atoms = [
+    move(10, "DD", 2, 2, [[], [0]], 2, "D", ["f", "b", "s"], 0),
+    move(11, "AA", 2, 3, [[], [2]], 2, "A", ["f", "b"], 2),
+    move(12, "NN", 5, 0, [[2], [1]], 2, "N", ["f", "b"], 1),
+]
 
 # This is a list of default piece names.
 prebuild = {
@@ -327,9 +342,6 @@ while True:
     else:
         large_camp = False
 
-    # If a leaping rider could attack the opposing back rank, we need to not use them.
-    even_strike = not ranks % 2 == 1
-
     # This calulates how many pieces will be needed.
     piece_count = files
     if large_camp:
@@ -356,7 +368,7 @@ while True:
 
     # This section generates all of the pieces.
     while len(slots) != piece_count:
-        new_piece = gen_piece(big_board, even_strike)
+        new_piece = gen_piece(big_board)
         if (new_piece.value <= 9 and new_piece.value >= 1) or new_piece.code in prebuild.keys():
             if new_piece.code not in pieces.keys():
                 pieces[new_piece.code] = new_piece
@@ -421,11 +433,34 @@ while True:
     else:
         pawns_row = pawn_check(pieces, home_row, pawns_row)
 
-    # If any pawn is unguarded, the board must be rejected.
+    # This section checks if any piece with a leaping rider attack can attack the opposing piece directly.
+    leap_safe = True
+    distance = ranks - 4
+    
+    if not large_camp:
+        if distance % 2 == 1:
+            # If the number of ranks is even, this test is unneeded.
+            distance = distance//2 + 2
+            for i, j in enumerate(home_row):
+                leap_safe = jump_over(distance, j, i, ranks) and leap_safe
+    else:
+        # If there are two rows of units, this test is more complex.
+        odd_lock = False
+        if distance % 2 == 1: odd_lock = True
+        distance = distance//2 + 2
+        
+        for i, j in enumerate(extra_row):
+               leap_safe = jump_over(distance, j, i, ranks) and leap_safe
+
+        if odd_lock: distance += 1
+        for i, j in enumerate(home_row):
+            leap_safe = jump_over(distance, j, i, ranks) and leap_safe
+
+    # If any pawn is unguarded, the board must be rejected. The board must also be rejected if any leaping riders can attack opposing pieces in the starting board state.
     safe_board = True
     for i in pawns_row:
         safe_board = safe_board and i
-    if safe_board:
+    if safe_board and leap_safe:
         break
 
 # -------------------------
@@ -500,9 +535,30 @@ ranks_left -= 2
 # This stores the number of empty ranks, for use later.
 empty_ranks = ranks_left
 
-while ranks_left:
+
+empty_zone = ["-" * files] * empty_ranks
+
+# This section might generate some special spaces with strange properties.
+symbol = False
+if randint(0, files) >= 5 and randint(0, empty_ranks) >= 3:
+    for i, j in enumerate(empty_zone):
+        empty_zone[i] = list(j)
+    symbol = ["#", "*", "!"][randint(0,2)]
+    pivot = empty_ranks//2
+    odd_rank = (empty_ranks % 2 == 1)
+    litter = randint(files//4, files//3)
+    while litter != 0:
+        x = randint(0, pivot)
+        y = randint(0, files - 1)
+        empty_zone[x][y] = symbol
+        empty_zone[-(x+1)][-(y+1)] = symbol
+        litter -= 1
+    for i, j in enumerate(empty_zone):
+        empty_zone[i] = "".join(j)
+
+for i in empty_zone:
     rank_count = label_rank(rank_count)
-    print("-" * files)
+    print(i)
     ranks_left -= 1
 
 rank_count = label_rank(rank_count)
@@ -550,3 +606,10 @@ else:
     print("There is no castling.")
 
 print("When promoting, Pawns may promote to any piece in this variant, except for the King.")
+
+tile_rules = ["can't be moved onto or through by any piece except for pawns.", 
+              "can't be moved through, but can be landed on.",
+              "grant pieces standing on them the right to move like a King."]
+if symbol:
+    print("Squares marked with "+symbol+" "+tile_rules[randint(0,2)])
+
