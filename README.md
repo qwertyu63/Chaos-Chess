@@ -1,5 +1,5 @@
 # Chaos-Chess
-A Python script for randomly generating new chess variants. Just run the script and it generates a brand-new variant of chess, with randomly generated pieces in a never-before-seen arrangement. The moves of each piece are recorded in Betza's funny notation <https://en.wikipedia.org/wiki/Betza%27s_funny_notation>.
+A Python script for randomly generating new chess variants. Just run the script and it generates a brand-new variant of chess, with randomly generated pieces in a never-before-seen arrangement. The moves of each piece are recorded in Betza's funny notation, detailed here: <https://en.wikipedia.org/wiki/Betza%27s_funny_notation>.
 
 # Features
 * The script generates names and labels for every piece. Pieces common to variant chess keep their normal names, while more novel pieces have randomly generated names.
@@ -43,3 +43,6 @@ All normal castling rules apply; the king moves two spaces towards the other pie
 When promoting, Pawns may promote to any piece in this variant, except for the King.
 
 ```
+
+# Credits and Licencing Details
+Chaos Chess has been created by Nicholas Fletcher. As noted in the LICENCE file, Chaos Chess has been dedicated to the public domain.
