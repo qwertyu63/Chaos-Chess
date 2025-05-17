@@ -634,6 +634,6 @@ print("When promoting, Pawns may promote to any piece in this variant, except fo
 tile_rules = ["are walls; they can't be moved onto or through by any piece, except for pawns.", 
               "are rough terrain; they can't be moved through, but can be landed on.",
               "are magic towers: pieces standing on them may move like a King.",
-              "are desert tiles: non-King pieces standing on them can't capture or be captured.]
+              "are desert tiles: non-King pieces standing on them can't capture or be captured."]
 if symbol:
     print("Squares marked with " + symbol + " " + tile_rules[randint(0, len(tile_rules)-1)])
