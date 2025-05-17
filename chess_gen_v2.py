@@ -214,8 +214,8 @@ def gen_pawn():
     '''This function will generate custom pawn movement.'''
     pawn_atoms = ["Wf", "Wf", "Ff", "Wfs"]
     pawn_string = ""
-    p_peace = pawn_atoms[rand_int(0, len(pawn_atoms-1))]
-    p_war = pawn_atoms[rand_int(0, len(pawn_atoms-1))]
+    p_peace = pawn_atoms[randint(0, len(pawn_atoms)-1)]
+    p_war = pawn_atoms[randint(0, len(pawn_atoms)-1)]
     if p_peace == p_war:
         pawn_string = p_peace
     else:
