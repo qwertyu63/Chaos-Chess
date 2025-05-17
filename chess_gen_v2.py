@@ -189,15 +189,19 @@ def gen_chaos(side, first = False):
     restrict = False
     count = 1
     if chaosroll == 1:
+        # This result means the move is restricted to non-attacking moves.
         new_side.peace_war()
         restrict = True
     elif chaosroll == 2:
+        # This result means the move is restricted to attacking moves.
         new_side.peace_war(False)
         restrict = True
     elif chaosroll == 3:
+        # This result means the the move is upgraded into a bent move.
         new_side.bent_ride()
         count = 2
     elif chaosroll == 4:
+        # This result means the move is restricted to specific directions.
         dir_lock = new_side.breaker()
         if dir_lock in ["f", "b"] and first:
             count = 0
@@ -208,7 +212,16 @@ def gen_chaos(side, first = False):
 
 def gen_pawn():
     '''This function will generate custom pawn movement.'''
-    pass
+    pawn_atoms = ["Wf", "Wf", "Ff", "Wfs"]
+    pawn_string = ""
+    p_peace = pawn_atoms[rand_int(0, len(pawn_atoms-1))]
+    p_war = pawn_atoms[rand_int(0, len(pawn_atoms-1))]
+    if p_peace == p_war:
+        pawn_string = p_peace
+    else:
+        pawn_string += p_peace+"m"
+        pawn_string += p_war+"a"
+    return pawn_string
 
 def pawn_check(pieces, slots, row, reach = 0):
     '''This function takes a row of pieces and calculates which pawns it protects.'''
@@ -331,7 +344,7 @@ while True:
     # This line defaults the board size to standard, for testing.
     # ranks, files = 8, 8
 
-    # If the board is wide enough, we will enable the use of long leapers and leaping riders.
+    # If the board is big enough, we will enable the use of long leapers and leaping riders.
     if ranks + files >= 18:
         big_board = True
     else:
@@ -624,4 +637,3 @@ tile_rules = ["are walls; they can't be moved onto or through by any piece, exce
               "are desert tiles: non-King pieces standing on them can't capture or be captured.]
 if symbol:
     print("Squares marked with " + symbol + " " + tile_rules[randint(0, len(tile_rules)-1)])
-
