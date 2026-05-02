@@ -212,9 +212,9 @@ def gen_chaos(side, first = False):
 
 def gen_pawn():
     '''This function will generate custom pawn movement.'''
-    pawn_atoms = ["Wf", "Wf", "Ff", "Wfs"]
+    pawn_atoms = ["Wf", "Wf", "Ff", "Ws"]
     pawn_string = ""
-    p_peace = pawn_atoms[randint(0, len(pawn_atoms)-1)]
+    p_peace = pawn_atoms[randint(0, len(pawn_atoms)-2)]
     p_war = pawn_atoms[randint(0, len(pawn_atoms)-1)]
     if p_peace == p_war:
         pawn_string = p_peace
@@ -439,6 +439,8 @@ while True:
             if i not in true_pieces:
                 true_pieces.append(i)
 
+    # At this point, we have generated the chess variant. From here, we are checking if it's valid.
+
     # This section checks if every pawn is guarded.
     pawns_row = [False] * files
     if large_camp:
@@ -479,6 +481,7 @@ while True:
 
 # -------------------------
 # If we get to this point, a valid starting condition has been generated.
+# Everthing after this is presenting the variant in a readable format for the user.
 # -------------------------
 
 if name_box[0][0] != "":
@@ -486,6 +489,7 @@ if name_box[0][0] != "":
 else:
     key_piece = name_box[1][0]
 
+# The setup was tracking which unique piece generated was the most powerful. That piece is used to name the variant, favoring pieces that don't exist in normal fairy chess.
 print(key_piece + " Chess:\n")
 
 default_list = ["X", "V", "H", "J", "Y"]
@@ -551,13 +555,11 @@ ranks_left -= 2
 
 # This stores the number of empty ranks, for use later.
 empty_ranks = ranks_left
-
-
 empty_zone = ["-" * files] * empty_ranks
 
 # This section might generate some special spaces with strange properties.
 symbol = False
-if randint(0, files) >= 5 and randint(0, empty_ranks) >= 3:
+if randint(0, files) >= 4 and randint(0, empty_ranks) >= 3:
     for i, j in enumerate(empty_zone):
         empty_zone[i] = list(j)
     symbol = ["#", "*", "!"][randint(0,2)]
@@ -607,8 +609,14 @@ for i in home_row:
 print()
 print()
 
+# In this section, the game considers using a variant pawn.
+pawn_code = "WfmFfa"
+if randint(1,3) == 1:
+    pawn_code = gen_pawn()
+
 # This section generates the list of moves.
 print("Piece List:")
+print("P: Pawn (" + pawn_code + ")")
 for i in true_pieces:
     print(pieces[i].describe())
 print()
@@ -617,7 +625,7 @@ print("""Rules:
 All normal chess rules apply, except as noted below.""")
 
 if empty_ranks >= 6:
-    print("Pawns may move three spaces on their first move. En passant can occur on either skipped space.")
+    print("Pawns may move two or three spaces on their first move. En passant can occur on either skipped space.")
 if empty_ranks <= 3:
     print("Pawns do not have their double step move option.")
 
