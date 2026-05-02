@@ -93,7 +93,7 @@ class piece(object):
             self.letter = "Q"
         else:
             for i in self.name:
-                if i.upper() not in list:
+                if i.upper() not in list and self.letter == "":
                     if i.upper() not in "WFDANRBKQP":
                         self.letter = i.upper()
             if self.letter == "":
